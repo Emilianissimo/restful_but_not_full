@@ -16,6 +16,22 @@ class Product extends Model
     	'is_deleted'
     ];
 
+    protected $hidden = [
+    	'pivot',
+    	'created_at',
+    	'updated_at'
+    ];
+
+    public function getMaxPriceAttribute()
+    {
+    	$prices = array();
+        foreach ($this->properties as $prop) {
+            array_push($prices, $prop->pivot->price);
+        };
+        $maxPrice = max($prices);
+        return $maxPrice;
+    }
+
     public function categories()
     {
     	return $this->belongsToMany(
@@ -70,9 +86,9 @@ class Product extends Model
         $this->save();
     }
 
-    public function toggleStatus()
+    public function toggleStatus($value)
     {
-        if ($this->is_published) {
+        if ($value == null) {
             return $this->setUnPublished();
         }
         return $this->setPublish();

@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Http\Controllers\Admin\CategoriesController;
 
 
 /*
@@ -21,5 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::group(['namespace'=>'Admin'], function(){
 	Route::apiResource('/categories', 'CategoriesController');
-	Route::apiResource('/products', 'ProductsController');
+	Route::apiResource('/properties', 'PropertiesController');
+	Route::resource('/products', 'ProductsController');
 });

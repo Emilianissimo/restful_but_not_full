@@ -18,7 +18,19 @@ class ProductsController extends Controller
                             ->with('properties')
                             ->get();
         
-        return $this->sendResponse($products->toArray(), 'Продукты подгружены.');
+        return $this->sendResponse($products->append('maxPrice')->toArray(), 'Продукты подгружены.');
+    }
+
+    public function create()
+    {
+        $categories = Category::all();
+        $properties = Property::all();
+        $response = [
+            'success' => true,
+            'data'    => ['categories'=>$categories, 'properties'=>$properties->makeHidden('price')],
+            'message' => 'Создание продукта',
+        ];
+        return response()->json($response, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -30,15 +42,20 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required'
+            'name' => 'required',
+            'min_price' => 'required',
+            'categories' => 'array|min:2|max:10'
         ]);
 
         if($validator->fails()){
             return $this->sendError('Ошибка.', $validator->errors());       
         }
 
-        $product = Product::add($request->all());
-        return $this->sendResponse($product->toArray(), 'Товар создана.');
+        $product = Product::add(json_decode($request->all()));
+        $product->setCategories(json_decode($request->get('categories')));
+        $product->setProperties(json_decode($request->get('properties')));
+        $product->toggleStatus(json_decode($request->get('status')));
+        return $this->sendResponse($product->toArray(), 'Товар создан.');
     }
 
     /**
@@ -57,27 +74,57 @@ class ProductsController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function show(Product $product)
+    public function show($id)
     {
-        $product = Product::find($product);
+        $product = Product::where('is_published', 1)
+                            ->where('is_deleted', 0)
+                            ->with('categories')
+                            ->with('properties')
+                            ->find($id);
         if (is_null($product)) {
             return $this->sendError('Товара не существует.');
         }
-        return $this->sendResponse($product->toArray(), 'Товар получена');
+        return $this->sendResponse($product->append('maxPrice')->toArray(), 'Товар получен');
+    }
+
+    public function edit($id)
+    {
+        $product = Product::where('is_published', 1)
+                            ->where('is_deleted', 0)
+                            ->with('categories')
+                            ->with('properties')
+                            ->find($id);
+        $categories = Category::all();
+        $properties = Property::all();
+        $response = [
+            'success' => true,
+            'data'    => [
+                'product'=>$product,
+                'all_categories'=>$categories, 
+                'all_properties'=>$properties->makeHidden('price')
+            ],
+            'message' => 'Создание продукта',
+        ];
+        return response()->json($response, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => 'required'
+            'name' => 'required',
+            'min_price' => 'required',
+            'categories' => 'array|min:2|max:10'
         ]);
 
          if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Ошибка.', $validator->errors());       
         }
 
         $product = Product::findOrFail($id);
-        $product->edit($request->all());
+        $product->edit(json_decode($request->all()));
+        $product->setCategories(json_decode($request->get('categories')));
+        $product->setProperties(json_decode($request->get('properties')));
+        $product->toggleStatus(json_decode($request->get('status')));
         return $this->sendResponse($product->toArray(), 'Товар обновлен.');
     }
 

@@ -11,6 +11,21 @@ class Property extends Model
     	'name',
     ];
 
+    protected $hidden = [
+    	'pivot',
+    	'created_at',
+    	'updated_at'
+    ];
+
+    protected $appends = [
+    	'price'
+    ];
+
+    public function getPriceAttribute()
+    {
+    	return $this->pivot->price;	
+    }
+
     public function products()
     {
     	return $this->belongsToMany(

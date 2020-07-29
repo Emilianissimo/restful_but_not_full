@@ -11,6 +11,12 @@ class Category extends Model
     	'name',
     ];
 
+    protected $hidden = [
+    	'pivot',
+    	'created_at',
+    	'updated_at'
+    ];
+
     public function products()
     {
     	return $this->belongsToMany(

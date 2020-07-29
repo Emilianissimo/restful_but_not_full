@@ -35,7 +35,7 @@ class CategoriesController extends Controller
             return $this->sendError('Ошибка.', $validator->errors());       
         }
 
-        $category = Category::add($request->all());
+        $category = Category::add(json_decode($request->all()));
         return $this->sendResponse($category->toArray(), 'Категория создана.');
     }
 
@@ -54,11 +54,11 @@ class CategoriesController extends Controller
         ]);
 
          if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Ошибка.', $validator->errors());       
         }
 
         $category = Category::findOrFail($id);
-        $category->edit($request->all());
+        $category->edit(json_decode($request->all()));
         return $this->sendResponse($category->toArray(), 'Категория обновлена.');
     }
 

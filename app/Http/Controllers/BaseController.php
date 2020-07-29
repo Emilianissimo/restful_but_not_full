@@ -13,8 +13,7 @@ class BaseController extends Controller
             'data'    => $result,
             'message' => $message,
         ];
-        return response()->json($response, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'],
-        JSON_UNESCAPED_UNICODE);
+        return response()->json($response, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
     }
     /**
      * return error response.
@@ -30,6 +29,6 @@ class BaseController extends Controller
         if(!empty($errorMessages)){
             $response['data'] = $errorMessages;
         }
-        return response()->json($response, $code);
+        return response()->json($response, $code, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
     }
 }

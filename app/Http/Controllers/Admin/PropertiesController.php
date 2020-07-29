@@ -2,27 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Property;
+use App\Http\Controllers\BaseController as Controller;
 use Illuminate\Http\Request;
 
 class PropertiesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $properties = Property::all();
+        return $this->sendResponse($properties->makeHidden('price')->toArray(), 'Свойства подгружены.');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    
     /**
      * Store a newly created resource in storage.
      *
@@ -31,26 +22,39 @@ class PropertiesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError('Ошибка.', $validator->errors());       
+        }
+
+        $property = Property::add(json_decode($request->all()));
+        return $this->sendResponse($property->makeHidden('price')->toArray(), 'Свойство создано.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
- 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    public function show(Property $property)
+    {
+        $property = Property::find($property);
+        if (is_null($property)) {
+            return $this->sendError('Свойства не существует.');
+        }
+        return $this->sendResponse($category->makeHidden('price')->toArray(), 'Свойство получено');
+    }
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required'
+        ]);
+
+         if($validator->fails()){
+            return $this->sendError('Ошибка.', $validator->errors());       
+        }
+
+        $property = Property::findOrFail($id);
+        $property->edit(json_decode($request->all()));
+        return $this->sendResponse($property->makeHidden('price')->toArray(), 'Свойство обновлено.');
     }
 
     /**
@@ -61,6 +65,8 @@ class PropertiesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $property = Property::findOrFail($id);
+        $property->remove();
+        return $this->sendResponse($property->makeHidden('price')->toArray(), 'Свойство удалено.');
     }
 }
