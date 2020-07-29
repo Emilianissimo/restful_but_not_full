@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Category;
+use App\Http\Controllers\BaseController as Controller;
 use Illuminate\Http\Request;
 
 class CategoriesController extends Controller
@@ -14,7 +15,8 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::all();
+        return $this->sendResponse($categories->toArray(), 'Категории подгружены.');
     }
 
     /**
@@ -25,27 +27,39 @@ class CategoriesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError('Ошибка.', $validator->errors());       
+        }
+
+        $category = Category::add($request->all());
+        return $this->sendResponse($category->toArray(), 'Категория создана.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    public function show(Category $category)
+    {
+        $category = Category::find($category);
+        if (is_null($category)) {
+            return $this->sendError('Категории не существует.');
+        }
+        return $this->sendResponse($category->toArray(), 'Категория получена');
+    }
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required'
+        ]);
+
+         if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors());       
+        }
+
+        $category = Category::findOrFail($id);
+        $category->edit($request->all());
+        return $this->sendResponse($category->toArray(), 'Категория обновлена.');
     }
 
     /**
@@ -56,6 +70,11 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category = Category::findOrFail($id);
+        if ($category->products()->exists()) {
+            return $this->sendError($category->toArray(), 'Категория имеет товары и не может быть удалена.');
+        }
+        $category->remove();
+        return $this->sendResponse($category->toArray(), 'Категория удалена.');
     }
 }

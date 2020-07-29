@@ -38,10 +38,6 @@ class Category extends Model
 
 	public function remove()
 	{
-		if ($this->products()->exists()) {
-			return redirect()->back()->with('error', 'Удаление невозможно, так как у категории есть товары.')
-		}
-		
 		$this->delete();
 	}
 }

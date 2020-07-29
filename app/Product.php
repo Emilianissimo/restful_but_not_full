@@ -6,7 +6,7 @@ use App\Category;
 use App\Property;
 use Illuminate\Database\Eloquent\Model;
 
-class Products extends Model
+class Product extends Model
 {
     //при создании товара стоит просто выбрать его Properties, после сохранить и назначить цену за каждый, после просто вывести {{$product->min_price}}-{{max($product->properties->price)}}
     protected $fillable = [
