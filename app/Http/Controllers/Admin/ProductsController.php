@@ -17,36 +17,18 @@ class ProductsController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function addPriceToProperty(Request $request, $id, $property_id)
     {
-        //
+        $product = Product::find($id);
+        $property = $product->properties()->where('id', $property_id)->firstOrFail();
+        $property->pivot->price = $request->get('price');
+        $property->save();
+        return redirect()->back();
     }
 
     /**
@@ -55,10 +37,6 @@ class ProductsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.

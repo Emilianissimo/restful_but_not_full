@@ -15,6 +15,10 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->float('min_price')->default(0);
+            $table->boolean('is_published')->default(false);
+            $table->boolean('is_deleted')->default(false); //Лучше разделить эти объекты, потому как объект не удаляется и может использоваться повторно, либо на реализация может быть изменена на подключение сущности статусов
             $table->timestamps();
         });
     }
